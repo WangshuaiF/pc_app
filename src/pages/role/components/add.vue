@@ -1,0 +1,114 @@
+<template>
+  <div>
+    <el-dialog :title="popup.isadd?'添加角色':'编辑角色'" :visible.sync="popup.isshow" @closed="cancel">
+      <el-form :model="user">
+        <el-form-item label="角色名称" label-width="100px">
+          <el-input v-model="user.rolename" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="角色权限" label-width="100px">
+          <el-tree
+            :data="menulist"
+            show-checkbox
+            node-key="id"
+            ref="tree"
+            :props="{children: 'children',label:'title'}"
+          ></el-tree>
+          <!-- :props="defaultProps" -->
+        </el-form-item>
+        <el-form-item label="状态" label-width="100px">
+          <el-switch v-model="user.status" :active-value="1" :inactive-value="2"></el-switch>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="cancel">取 消</el-button>
+        <el-button type="primary" @click="roleadd" v-if="popup.isadd">添 加</el-button>
+        <el-button type="primary" @click="roleedit" v-else>修 改</el-button>
+      </div>
+    </el-dialog>
+  </div>
+</template>
+
+<script>
+import {
+  roleAddUrl,
+  roleDetailUrl,
+  menuListUrl,
+  roleEditUrl
+} from "../../../utils/http";
+import { successalter } from "../../../utils/alter";
+export default {
+  props: ["popup"],
+  data() {
+    return {
+      user: {
+        rolename: "",
+        menus: "",
+        status: 1
+      },
+      menulist: []
+    };
+  },
+  mounted() {
+    menuListUrl().then(res => {
+      // console.log(res);
+      if (res.data.code === 200) {
+        this.menulist = res.data.list;
+      }
+    });
+  },
+  methods: {
+    cancel() {
+      this.popup.isshow = false;
+    },
+    usernull() {
+      (this.user = {
+        rolename: "",
+        menus: "",
+        status: 1
+      }),
+        this.$refs.tree.setCheckedKeys([]);
+    },
+
+    // 添加
+    roleadd() {
+      //menus赋值
+      this.user.menus = JSON.stringify(this.$refs.tree.getCheckedKeys());
+      roleAddUrl(this.user).then(res => {
+        if (res.data.code === 200) {
+          successalter(res.data.msg);
+          //取消弹框
+          this.cancel();
+          //   清空数据
+          this.usernull();
+          //刷新列表
+          this.$emit("init");
+        }
+      });
+    },
+    getOne(id) {
+      roleDetailUrl(id).then(res => {
+        this.user = res.data.list;
+        //补id
+        this.user.id = id;
+        //给树形控件赋值
+        this.$refs.tree.setCheckedKeys(JSON.parse(this.user.menus));
+      });
+    },
+    roleedit() {
+      //先取出树形控件的数据给menus，再发请求
+      this.user.menus = JSON.stringify(this.$refs.tree.getCheckedKeys());
+      roleEditUrl(this.user).then(res => {
+        if (res.data.code === 200) {
+          successalter(res.data.msg);
+          this.cancel();
+          this.$emit("init");
+          this.usernull();
+        }
+      });
+    }
+  }
+};
+</script>
+
+<style>
+</style>
