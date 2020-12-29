@@ -35,9 +35,9 @@ let getters = {
 
 let actions = {
     // 获取列表
-    obtainList(context,bool) {
-        let params=bool?{}:{page:context.state.page,size:context.state.size}
-        
+    obtainList(context, bool) {
+        let params = bool ? {} : { page: context.state.page, size: context.state.size }
+
         specsListUrl(params).then(res => {
             if (res.data.code === 200) {
                 if (res.data.list.length === 0 && context.state.page > 1) {
@@ -45,6 +45,7 @@ let actions = {
                     context.dispatch("obtainList");
                     return
                 }
+
                 let list = res.data.list;
                 list.forEach(item => {
                     item.attrs = JSON.parse(item.attrs);

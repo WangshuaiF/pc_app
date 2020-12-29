@@ -1,8 +1,8 @@
 <template>
   <div>
-    <el-button type="primary">添加</el-button>
-    <v-list></v-list>
-    <v-add :popup="popup"></v-add>
+    <el-button type="primary" @click="goodsadd">添加</el-button>
+    <v-list @goodsedit="edit($event)"></v-list>
+    <v-add :popup="popup" ref="add"></v-add>
   </div>
 </template>
 
@@ -17,10 +17,20 @@ export default {
   data() {
     return {
       popup: {
-        isshow: true,
+        isshow: false,
         isadd: true
       }
     };
+  },
+  methods: {
+    goodsadd() {
+      this.popup.isshow = true;
+    },
+    edit(id){
+      this.popup.isshow=true
+      this.popup.isadd=false
+      this.$refs.add.getOne(id);
+    }
   }
 };
 </script>

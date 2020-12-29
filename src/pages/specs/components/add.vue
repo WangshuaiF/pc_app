@@ -51,7 +51,8 @@ export default {
   },
   methods: {
     ...mapActions({
-      obtainList: "specs/obtainList"
+      obtainList: "specs/obtainList",
+      obtainTotal:"specs/obtainTotal"
     }),
     cancel() {
       if (!this.popup.isadd) {
@@ -85,6 +86,7 @@ export default {
           this.cancel();
           this.usernull();
           this.obtainList();
+          this.obtainTotal()
         }
       });
     },

@@ -1,21 +1,32 @@
-# pc_app
+### 1菜单管理
 
-> A Vue.js project
+#### ok
 
-## Build Setup
+### 2角色管理
 
-``` bash
-# install dependencies
-npm install
+#### ok
 
-# serve with hot reload at localhost:8080
-npm run dev
+### 3管理员管理
 
-# build for production with minification
-npm run build
+#### ok
 
-# build for production and view the bundle analyzer report
-npm run build --report
-```
+### 4商品分类
 
-For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
+#### ok
+
+### 5商品规格
+
+#### ok
+
+### 6商品管理
+
+#### ok
+
+### 7会员管理
+
+#### ok
+
+### 8轮播图管理
+
+#### ok
+

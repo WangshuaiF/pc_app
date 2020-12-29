@@ -61,16 +61,19 @@ export default {
   },
   methods: {
     ...mapActions({
+      // 获取
       obtainList: "specs/obtainList",
       obtainTotal: "specs/obtainTotal",
       changePage: "specs/changePage"
     }),
+    // 删除
     specsdel(id) {
       specsDelUrl({ id: id }).then(res => {
         console.log(res);
         if (res.data.code == 200) {
           successalter(res.data.msg);
           this.obtainList();
+          this.obtainTotal()
         }
       });
     },
