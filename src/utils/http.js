@@ -44,6 +44,17 @@ function dataFormData(obj) {
 }
 
 
+// ===============================登录======================================
+
+    export const loginUrl=(obj)=>{
+        return axios({
+            url:baseUrl+"/api/userlogin",
+            method:"post",
+            data:qs.stringify(obj)
+        })
+    }
+
+// ===============================end=======================================
 
 
 // ==============================菜单管理=================================
@@ -399,4 +410,47 @@ export const goodsEditUrl = (obj) => {
         data: dataFormData(obj)
     })
 }
+//==================================end=====================
+
+//==================================秒杀活动=====================
+
+// 添加
+export const seckillAddUrl=(obj)=>{
+    return axios({
+        url:baseUrl+"/api/seckadd",
+        method:"post",
+        data:qs.stringify(obj)
+    })
+}
+// 列表
+export const seckillListUrl=()=>{
+    return axios({
+        url:baseUrl+"/api/secklist",
+    })
+}
+// 获取详情
+export const seckillDetailUrl=(obj)=>{
+    return axios({
+        url:baseUrl+"/api/seckinfo",
+        params:obj
+    })
+}
+// 删除
+export const seckillDelUrl=(obj)=>{
+    return axios({
+        url:baseUrl+"/api/seckdelete",
+        method:"post",
+        data:qs.stringify(obj)
+    })
+}
+// 编辑
+export const seckillEdit=(obj)=>{
+    return axios({
+        url:baseUrl+"/api/seckedit",
+        method:"post",
+        data:qs.stringify(obj)
+    })
+}
+
+
 //==================================end=====================

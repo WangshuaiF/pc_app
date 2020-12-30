@@ -1,17 +1,38 @@
 <template>
   <div>
-      <h3>
-          秒杀活动
-      </h3>
+    <el-button type="primary" @click="seckilladd">添加</el-button>
+    <v-list></v-list>
+    <v-add :popup='popup'></v-add>
   </div>
 </template>
 
 <script>
+import vList from "./components/list.vue";
+import vAdd from "./components/add.vue";
 export default {
-
-}
+  components: {
+    vAdd,
+    vList
+  },
+  data(){
+    return {
+      popup:{
+        isshow:false,
+        isadd:true
+      }
+    }
+  },
+  methods:{
+    seckilladd(){
+      this.popup.isshow=true;
+      this.popup.isadd=true
+  }
+  }
+};
 </script>
 
-<style>
-
+<style scoped>
+.el-button--primary {
+  margin: 20px;
+}
 </style>

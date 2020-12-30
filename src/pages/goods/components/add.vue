@@ -104,7 +104,7 @@ import {
   goodsDetailUrl,
   goodsEditUrl
 } from "../../../utils/http";
-import { successalter } from "../../../utils/alter";
+import { successalter, erroralter } from "../../../utils/alter";
 import E from "wangeditor";
 export default {
   props: ["popup"],
@@ -114,6 +114,7 @@ export default {
       user: {
         first_cateid: "",
         second_cateid: "",
+        goodsname: "",
         price: "",
         market_price: "",
         img: null,
@@ -193,6 +194,7 @@ export default {
       this.user = {
         first_cateid: "",
         second_cateid: "",
+        goodsname: "",
         price: "",
         market_price: "",
         img: null,
@@ -209,26 +211,70 @@ export default {
       //规格属性
       this.specsAttribute = [];
     },
+    // 验证
+    checkProps() {
+      return new Promise(resolve => {
+        if (this.user.first_cateid === "") {
+          erroralter("一级分类不能为空");
+          return;
+        }
+        if (this.user.second_cateid === "") {
+          erroralter("二级分类不能为空");
+          return;
+        }
+        if (this.user.goodsname === "") {
+          erroralter("商品名称不能为空");
+          return;
+        }
+        if (this.user.price === "") {
+          erroralter("价格不能为空");
+          return;
+        }
+        if (this.user.market_price === "") {
+          erroralter("市场价格不能为空");
+          return;
+        }
+        if (!this.user.img) {
+          erroralter("请选择图片");
+          return;
+        }
+        if (this.user.specsid === "") {
+          erroralter("商品规格不能为空");
+          return;
+        }
+        if (this.user.specsattr.length === 0) {
+          erroralter("请选择规格属性");
+          return;
+        }
+        if (this.editor.txt.html() == "") {
+          erroralter("请输入商品描述");
+          return;
+        }
+        resolve();
+      });
+    },
     // 添加
     goodsadd() {
-      this.user.description = this.editor.txt.html();
+      this.checkProps().then(() => {
+        this.user.description = this.editor.txt.html();
 
-      let data = {
-        ...this.user,
-        specsattr: JSON.stringify(this.user.specsattr)
-      };
-      console.log(data);
-      goodsAddUrl(data).then(res => {
-        if (res.data.code === 200) {
-          successalter(res.data.msg);
-          //   数据置空
-          this.usernull();
-          //   清楚弹框
-          this.cancel();
-          //   获取列表和分页总数
-          this.goodsobtainList();
-          this.goodsobtainTotal();
-        }
+        let data = {
+          ...this.user,
+          specsattr: JSON.stringify(this.user.specsattr)
+        };
+        console.log(data);
+        goodsAddUrl(data).then(res => {
+          if (res.data.code === 200) {
+            successalter(res.data.msg);
+            //   数据置空
+            this.usernull();
+            //   清楚弹框
+            this.cancel();
+            //   获取列表和分页总数
+            this.goodsobtainList();
+            this.goodsobtainTotal();
+          }
+        });
       });
     },
     // 获取详情
@@ -253,21 +299,24 @@ export default {
         }
       });
     },
+    // 编辑
     edit() {
-      this.user.description = this.editor.txt.html();
-      let data = {
-        ...this.user,
-        specsattr: JSON.stringify(this.user.specsattr)
-      };
-      goodsEditUrl(data).then(res => {
-        if (res.data.code === 200) {
-          successalter(res.data.msg);
-          this.cancel();
-          this.usernull();
-          //   获取列表和分页总数
-          this.goodsobtainList();
-          this.goodsobtainTotal();
-        }
+      this.checkProps().then(() => {
+        this.user.description = this.editor.txt.html();
+        let data = {
+          ...this.user,
+          specsattr: JSON.stringify(this.user.specsattr)
+        };
+        goodsEditUrl(data).then(res => {
+          if (res.data.code === 200) {
+            successalter(res.data.msg);
+            this.cancel();
+            this.usernull();
+            //   获取列表和分页总数
+            this.goodsobtainList();
+            this.goodsobtainTotal();
+          }
+        });
       });
     },
     // 创建编辑器

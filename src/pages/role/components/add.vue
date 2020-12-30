@@ -35,7 +35,7 @@ import {
   menuListUrl,
   roleEditUrl
 } from "../../../utils/http";
-import { successalter } from "../../../utils/alter";
+import { successalter, erroralter } from "../../../utils/alter";
 export default {
   props: ["popup"],
   data() {
@@ -61,28 +61,43 @@ export default {
       this.popup.isshow = false;
     },
     usernull() {
-      (this.user = {
+      this.user = {
         rolename: "",
         menus: "",
         status: 1
-      }),
+      };
         this.$refs.tree.setCheckedKeys([]);
     },
-
+    // 验证
+    checkProps() {
+      return new Promise(resolve => {
+        if (this.user.rolename === "") {
+          erroralter("角色名称不能为空");
+          return;
+        }
+        // if (this.$refs.tree.setCheckedKeys().length=== 0) {
+        //   erroralter("请设置角色权限");
+        //   return;
+        // }
+        resolve();
+      });
+    },
     // 添加
     roleadd() {
-      //menus赋值
-      this.user.menus = JSON.stringify(this.$refs.tree.getCheckedKeys());
-      roleAddUrl(this.user).then(res => {
-        if (res.data.code === 200) {
-          successalter(res.data.msg);
-          //取消弹框
-          this.cancel();
-          //   清空数据
-          this.usernull();
-          //刷新列表
-          this.$emit("init");
-        }
+      this.checkProps().then(() => {
+        //menus赋值
+        this.user.menus = JSON.stringify(this.$refs.tree.getCheckedKeys());
+        roleAddUrl(this.user).then(res => {
+          if (res.data.code === 200) {
+            successalter(res.data.msg);
+            //取消弹框
+            this.cancel();
+            //   清空数据
+            this.usernull();
+            //刷新列表
+            this.$emit("init");
+          }
+        });
       });
     },
     getOne(id) {

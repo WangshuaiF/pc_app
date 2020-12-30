@@ -62,7 +62,7 @@ export default new Router({
     },
     {
       path: '/',
-      name: "首页",
+      name: "大首页",
       component: () => import("../pages/index/index.vue"),
       children: [
         {

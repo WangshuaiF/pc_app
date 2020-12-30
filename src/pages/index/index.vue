@@ -50,7 +50,11 @@
         </el-menu>
       </el-aside>
       <el-container>
-        <el-header>Header</el-header>
+        <el-header>
+          <h3>
+            {{userlist.username}}
+          </h3>
+        </el-header>
         <el-main>
           <!-- 面包屑导航 -->
           <el-breadcrumb separator-class="el-icon-arrow-right" v-if="$route.name">
@@ -68,8 +72,13 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
 export default {
- 
+  computed:{
+    ...mapGetters({
+      userlist:'userlist'
+    })
+  }
 };
 </script>
 

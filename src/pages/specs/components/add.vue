@@ -34,7 +34,7 @@
 
 <script>
 import { specsAddUrl, specsDetailUrl, specsEditUrl } from "../../../utils/http";
-import { successalter } from "../../../utils/alter";
+import { successalter,erroralter } from "../../../utils/alter";
 import { mapActions, mapGetters } from "vuex";
 export default {
   props: ["popup"],
@@ -52,7 +52,7 @@ export default {
   methods: {
     ...mapActions({
       obtainList: "specs/obtainList",
-      obtainTotal:"specs/obtainTotal"
+      obtainTotal: "specs/obtainTotal"
     }),
     cancel() {
       if (!this.popup.isadd) {
@@ -77,17 +77,33 @@ export default {
       };
       this.attrsArr = [{ value: "" }];
     },
+    // 验证
+    checkProps() {
+      return new Promise(resolve => {
+        if (this.user.specsname === "") {
+          erroralter("规格名称不能为空");
+          return;
+        }
+        if (this.user.attrs.length === 0) {
+          erroralter("规格属性不能为空");
+          return;
+        }
+        resolve();
+      });
+    },
     // 添加
     specsadd() {
-      this.user.attrs = JSON.stringify(this.attrsArr.map(item => item.value));
-      specsAddUrl(this.user).then(res => {
-        if (res.data.code === 200) {
-          successalter(res.data.msg);
-          this.cancel();
-          this.usernull();
-          this.obtainList();
-          this.obtainTotal()
-        }
+      this.checkProps().then(() => {
+        this.user.attrs = JSON.stringify(this.attrsArr.map(item => item.value));
+        specsAddUrl(this.user).then(res => {
+          if (res.data.code === 200) {
+            successalter(res.data.msg);
+            this.cancel();
+            this.usernull();
+            this.obtainList();
+            this.obtainTotal();
+          }
+        });
       });
     },
     // 获取一条详情
@@ -102,15 +118,17 @@ export default {
     },
     // 编辑修改
     edit() {
-      this.user.attrs = JSON.stringify(this.attrsArr.map(item => item.value));
+      this.checkProps().then(()=>{
+        this.user.attrs = JSON.stringify(this.attrsArr.map(item => item.value));
       specsEditUrl(this.user).then(res => {
-        if(res.data.code===200){
+        if (res.data.code === 200) {
           successalter(res.data.msg);
           this.cancel();
           this.usernull();
           this.obtainList();
         }
       });
+      })
     }
   },
   computed: {

@@ -39,7 +39,11 @@
 <script>
 import path from "path";
 import { erroralter, successalter } from "../../../utils/alter";
-import { bannerAddUrl, bannerDetailUrl, bannerEditUrl } from "../../../utils/http";
+import {
+  bannerAddUrl,
+  bannerDetailUrl,
+  bannerEditUrl
+} from "../../../utils/http";
 export default {
   props: ["popup", "useradd"],
   data() {
@@ -64,6 +68,20 @@ export default {
         img: null,
         status: 1
       };
+    },
+    // 验证
+    checkProps() {
+      return new Promise((resolve, reject) => {
+        if (this.user.title === "") {
+          erroralter("标题不能为空");
+          return;
+        }
+        if (!this.user.img) {
+          erroralter("图片不能为空");
+          return;
+        }
+        resolve();
+      });
     },
     // 上传文件
     /* changeImg(e) {
@@ -93,7 +111,7 @@ export default {
     changeImg(e) {
       console.log(e);
       let file = e.raw;
-       // 判断图片类型
+      // 判断图片类型
       let suffix = path.extname(file.name);
       let arr = [".png", ".gif", ".jpg", ".jpeg"];
       if (!arr.some(item => item === suffix)) {
@@ -110,13 +128,15 @@ export default {
     },
     // 添加
     cateadd() {
-      bannerAddUrl(this.user).then(res => {
-        if (res.data.code === 200) {
-          successalter(res.data.msg);
-          this.cancel();
-          this.usernull();
-          this.$emit("init");
-        }
+      this.checkProps().then(() => {
+        bannerAddUrl(this.user).then(res => {
+          if (res.data.code === 200) {
+            successalter(res.data.msg);
+            this.cancel();
+            this.usernull();
+            this.$emit("init");
+          }
+        });
       });
     },
     // 获取详细信息
@@ -129,14 +149,17 @@ export default {
         this.temporaryImg = this.$pre + this.user.img;
       });
     },
+    // 编辑
     edit() {
-      bannerEditUrl(this.user).then(res => {
-        if (res.data.code === 200) {
-          successalter(res.data.msg);
-          this.cancel();
-          this.usernull();
-          this.$emit("init");
-        }
+      this.checkProps().then(() => {
+        bannerEditUrl(this.user).then(res => {
+          if (res.data.code === 200) {
+            successalter(res.data.msg);
+            this.cancel();
+            this.usernull();
+            this.$emit("init");
+          }
+        });
       });
     }
   }

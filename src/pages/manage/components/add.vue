@@ -40,7 +40,7 @@ import {
   manageDetailUrl,
   manageEditUrl
 } from "../../../utils/http";
-import { successalter } from "../../../utils/alter";
+import { successalter, erroralter } from "../../../utils/alter";
 export default {
   props: ["popup"],
   data() {
@@ -71,15 +71,36 @@ export default {
         status: 1
       };
     },
+    // 验证
+    checkProps() {
+      return new Promise(resolve => {
+        if (this.user.roleid === "") {
+          erroralter("请选择所属角色");
+          return;
+        }
+        if (this.user.username === "") {
+          erroralter("用户名不能为空");
+          return;
+        }
+        if (this.user.password === "") {
+          erroralter("密码不能为空");
+          return;
+        }
+
+        resolve();
+      });
+    },
     //添加
     manageadd() {
-      manageAddUrl(this.user).then(res => {
-        if (res.data.code === 200) {
-          successalter(res.data.msg);
-          this.cancel();
-          this.usernull();
-          this.$emit("init");
-        }
+      this.checkProps().then(() => {
+        manageAddUrl(this.user).then(res => {
+          if (res.data.code === 200) {
+            successalter(res.data.msg);
+            this.cancel();
+            this.usernull();
+            this.$emit("init");
+          }
+        });
       });
     },
     // 获取一条数据详情
@@ -94,13 +115,15 @@ export default {
     },
     // 修改
     manageEdit() {
-      manageEditUrl(this.user).then(res => {
-        if (res.data.code === 200) {
-          successalter(res.data.msg);
-          this.usernull();
-          this.cancel();
-          this.$emit("init");
-        }
+      this.checkProps().then(() => {
+        manageEditUrl(this.user).then(res => {
+          if (res.data.code === 200) {
+            successalter(res.data.msg);
+            this.usernull();
+            this.cancel();
+            this.$emit("init");
+          }
+        });
       });
     }
   }

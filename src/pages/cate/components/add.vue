@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-dialog :title="popup.isadd?'分类添加':'分类编辑'" :visible.sync="popup.isshow">
-      <el-form :model="list">
+      <el-form :model="user">
         <el-form-item label="上级菜单" label-width="100px">
           <el-select v-model="user.pid">
             <el-option label="请选择" value disabled></el-option>
@@ -96,15 +96,41 @@ export default {
       // 赋值给user.img
       this.user.img = file;
     },
+    // 验证
+    checkProps() {
+      return new Promise(resolve => {
+        if (this.user.pid === "") {
+          erroralter("上级菜单不能为空");
+          return;
+        }
+        if (this.user.catename === "") {
+          erroralter("分类名称不能为空");
+          return;
+        }
+        if ((this.temporaryImg = "")) {
+          if (!this.user.img) {
+            erroralter("图片不能为空");
+            return;
+          }
+        }
+        if (!this.user.img) {
+          erroralter("图片不能为空");
+          return;
+        }
+        resolve();
+      });
+    },
     // 添加
     cateadd() {
-      cateAddUrl(this.user).then(res => {
-        if (res.data.code === 200) {
-          successalter(res.data.msg);
-          this.cancel();
-          this.usernull();
-          this.obtainList();
-        }
+      this.checkProps().then(() => {
+        cateAddUrl(this.user).then(res => {
+          if (res.data.code === 200) {
+            successalter(res.data.msg);
+            this.cancel();
+            this.usernull();
+            this.obtainList();
+          }
+        });
       });
     },
     // 获取详细信息
@@ -118,13 +144,15 @@ export default {
       });
     },
     edit() {
-      cateEditUrl(this.user).then(res => {
-        if (res.data.code === 200) {
-          successalter(res.data.msg);
-          this.cancel();
-          this.usernull();
-          this.obtainList();
-        }
+      this.checkProps().then(() => {
+        cateEditUrl(this.user).then(res => {
+          if (res.data.code === 200) {
+            successalter(res.data.msg);
+            this.cancel();
+            this.usernull();
+            this.obtainList();
+          }
+        });
       });
     }
   }

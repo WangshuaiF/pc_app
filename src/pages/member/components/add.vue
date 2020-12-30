@@ -25,7 +25,7 @@
 
 <script>
 import { memberDetailUrl, memberEditUrl } from "../../../utils/http";
-import { successalter } from "../../../utils/alter";
+import { successalter,erroralter } from "../../../utils/alter";
 export default {
   props: ["popup"],
   data() {
@@ -62,15 +62,35 @@ export default {
         status: 1
       };
     },
-
-    memberedit() {
-      memberEditUrl(this.user).then(res => {
-        if (res.data.code === 200) {
-          successalter(res.data.msg);
-          this.cancel();
-          this.usernull();
-          this.$emit("init");
+    // 验证
+    checkProps() {
+      return new Promise(resolve => {
+        if (this.user.phone === "") {
+          erroralter("手机号不能为空");
+          return;
         }
+        if (this.user.nickname === "") {
+          erroralter("昵称不能为空");
+          return;
+        }
+        // if (this.user.password === "") {
+        //   erroralter("密码不能为空");
+        //   return;
+        // }
+        resolve();
+      });
+    },
+    // 编辑
+    memberedit() {
+      this.checkProps().then(() => {
+        memberEditUrl(this.user).then(res => {
+          if (res.data.code === 200) {
+            successalter(res.data.msg);
+            this.cancel();
+            this.usernull();
+            this.$emit("init");
+          }
+        });
       });
     }
   }
