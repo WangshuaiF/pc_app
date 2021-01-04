@@ -1,8 +1,8 @@
 <template>
   <div>
     <el-button type="primary" @click="seckilladd">添加</el-button>
-    <v-list></v-list>
-    <v-add :popup='popup'></v-add>
+    <v-list @seckilledit="edit($event)"></v-list>
+    <v-add :popup="popup" ref="getOne"></v-add>
   </div>
 </template>
 
@@ -14,19 +14,24 @@ export default {
     vAdd,
     vList
   },
-  data(){
+  data() {
     return {
-      popup:{
-        isshow:false,
-        isadd:true
+      popup: {
+        isshow: false,
+        isadd: true
       }
-    }
+    };
   },
-  methods:{
-    seckilladd(){
-      this.popup.isshow=true;
-      this.popup.isadd=true
-  }
+  methods: {
+    seckilladd() {
+      this.popup.isshow = true;
+      this.popup.isadd = true;
+    },
+    edit(id) {
+      this.popup.isshow = true;
+      this.popup.isadd = false;
+      this.$refs.getOne.getOne(id);
+    }
   }
 };
 </script>

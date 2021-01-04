@@ -2,6 +2,9 @@ import Vue from 'vue'
 import axios from 'axios';
 import qs from 'qs';
 import { erroralter } from './alter'
+
+import store from '../store'
+
 //开发环境8080
 let baseUrl = "/api";
 Vue.prototype.$pre = "http://localhost:3000";
@@ -11,19 +14,26 @@ Vue.prototype.$pre = "http://localhost:3000";
 
 //请求拦截 :回调函数的参数就是本次请求要发送给后端的参数
 //在每次请求的时候要做的事，都可以在请求拦截中统一处理，注意，一定要return
-//return 内容就是后端收到的请求
-// axios.interceptors.request.use(req => {
-//     if (req.url != baseUrl + "/api/login") {
-//         req.headers.authorization = JSON.parse(localStorage.getItem("userInfo")).token;
-//     }
-//     return req
-// })
+//请求拦截:设置请求头
+axios.interceptors.request.use(config => {
+    if (config.url !== baseUrl + "/api/userlogin") {
+        config.headers.authorization = store.state.userlist.token
+    }
+    return config
+})
 
 //响应拦截
 axios.interceptors.response.use(res => {
     //统一处理list是null的情况
     if (!res.data.list) {
         res.data.list = []
+    }
+    //掉线处理
+    if (res.data.msg === "登录已过期或访问权限受限") {
+        //清除用户登录的信息 userInfo
+        store.dispatch("obtainuserList", {})
+        //跳到登录页面
+        router.push('/login')
     }
     console.group("本次请求地址是" + res.config.url);
     console.log(res);
@@ -46,13 +56,13 @@ function dataFormData(obj) {
 
 // ===============================登录======================================
 
-    export const loginUrl=(obj)=>{
-        return axios({
-            url:baseUrl+"/api/userlogin",
-            method:"post",
-            data:qs.stringify(obj)
-        })
-    }
+export const loginUrl = (obj) => {
+    return axios({
+        url: baseUrl + "/api/userlogin",
+        method: "post",
+        data: qs.stringify(obj)
+    })
+}
 
 // ===============================end=======================================
 
@@ -415,40 +425,40 @@ export const goodsEditUrl = (obj) => {
 //==================================秒杀活动=====================
 
 // 添加
-export const seckillAddUrl=(obj)=>{
+export const seckillAddUrl = (obj) => {
     return axios({
-        url:baseUrl+"/api/seckadd",
-        method:"post",
-        data:qs.stringify(obj)
+        url: baseUrl + "/api/seckadd",
+        method: "post",
+        data: qs.stringify(obj)
     })
 }
 // 列表
-export const seckillListUrl=()=>{
+export const seckillListUrl = () => {
     return axios({
-        url:baseUrl+"/api/secklist",
+        url: baseUrl + "/api/secklist",
     })
 }
 // 获取详情
-export const seckillDetailUrl=(obj)=>{
+export const seckillDetailUrl = (obj) => {
     return axios({
-        url:baseUrl+"/api/seckinfo",
-        params:obj
+        url: baseUrl + "/api/seckinfo",
+        params: obj
     })
 }
 // 删除
-export const seckillDelUrl=(obj)=>{
+export const seckillDelUrl = (obj) => {
     return axios({
-        url:baseUrl+"/api/seckdelete",
-        method:"post",
-        data:qs.stringify(obj)
+        url: baseUrl + "/api/seckdelete",
+        method: "post",
+        data: qs.stringify(obj)
     })
 }
 // 编辑
-export const seckillEdit=(obj)=>{
+export const seckillEditUrl = (obj) => {
     return axios({
-        url:baseUrl+"/api/seckedit",
-        method:"post",
-        data:qs.stringify(obj)
+        url: baseUrl + "/api/seckedit",
+        method: "post",
+        data: qs.stringify(obj)
     })
 }
 

@@ -15,9 +15,9 @@
         </template>
       </el-table-column>
       <el-table-column prop="address" label="操作">
-        <template>
-          <el-button type="primary">编辑</el-button>
-          <el-button type="danger">删除</el-button>
+        <template slot-scope="scope">
+          <el-button type="primary" @click="seckilledit(scope.row.id)">编辑</el-button>
+          <el-button type="danger" @click="del(scope.row.id)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -26,6 +26,8 @@
 
 <script>
 import { mapActions, mapGetters } from "vuex";
+import { seckillDelUrl } from "../../../utils/http";
+import { successalter } from "../../../utils/alter";
 export default {
   computed: {
     ...mapGetters({
@@ -35,7 +37,18 @@ export default {
   methods: {
     ...mapActions({
       obtainList: "seckill/obtainList"
-    })
+    }),
+    del(id) {
+      seckillDelUrl({ id: id }).then(res => {
+        if (res.data.code===200) {
+          successalter(res.data.msg);
+          this.obtainList();
+        }
+      });
+    },
+    seckilledit(id){
+      this.$emit("seckilledit",id)
+    }
   },
   mounted() {
     this.obtainList();

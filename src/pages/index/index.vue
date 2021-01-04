@@ -16,28 +16,42 @@
             <span slot="title">首页</span>
           </el-menu-item>
 
+          <div v-for="item in userlist.menus" :key="item.id">
+            <el-menu-item v-if="!item.children" :index="item.url">{{item.title}}</el-menu-item>
+            <el-submenu :index="item.id+''" v-if="item.children">
+              <template slot="title">
+                <i :class="item.icon"></i>
+                <span>{{item.title}}</span>
+              </template>
+              <!-- 下拉列表 -->
+              <el-menu-item-group>
+                <el-menu-item v-for="i in item.children" :key="i.id" :index="i.url">{{i.title}}</el-menu-item>
+              </el-menu-item-group>
+            </el-submenu>
+          </div>
+
           <!-- 系统设置 -->
-          <el-submenu index="1">
+          <!-- <el-submenu index="1">
             <template slot="title">
               <i class="el-icon-setting"></i>
               <span>系统设置</span>
-            </template>
+          </template>-->
 
-            <!-- 下拉列表 -->
-            <el-menu-item-group>
+          <!-- 下拉列表 -->
+          <!--<el-menu-item-group>
               <el-menu-item index="/menu">菜单管理</el-menu-item>
               <el-menu-item index="/role">角色管理</el-menu-item>
               <el-menu-item index="manage">管理员管理</el-menu-item>
             </el-menu-item-group>
-          </el-submenu>
+          </el-submenu>-->
 
           <!-- 商城管理 -->
-          <el-submenu index="2">
+          <!-- <el-submenu index="2">
             <template slot="title">
               <i class="el-icon-setting"></i>
               <span>商城管理</span>
             </template>
-            <!-- 下拉列表 -->
+            下拉列表
             <el-menu-item-group>
               <el-menu-item index="/cate">商品分类</el-menu-item>
               <el-menu-item index="/specs">商品规格</el-menu-item>
@@ -46,14 +60,17 @@
               <el-menu-item index="/banner">轮播图管理</el-menu-item>
               <el-menu-item index="/seckill">秒杀活动</el-menu-item>
             </el-menu-item-group>
-          </el-submenu>
+          </el-submenu>-->
         </el-menu>
       </el-aside>
       <el-container>
         <el-header>
-          <h3>
-            {{userlist.username}}
-          </h3>
+          <div class="head">
+            <div @click="outlogin" class="pright">
+              <el-button type="danger" icon="el-icon-error" circle></el-button>
+            </div>
+            <h3 class="right">{{userlist.username}}</h3>
+          </div>
         </el-header>
         <el-main>
           <!-- 面包屑导航 -->
@@ -72,12 +89,21 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapGetters, mapActions } from "vuex";
 export default {
-  computed:{
+  computed: {
     ...mapGetters({
-      userlist:'userlist'
+      userlist: "userlist"
     })
+  },
+  methods: {
+    ...mapActions({
+      obtainuserList: "obtainuserList"
+    }),
+    outlogin() {
+      this.obtainuserList({});
+      this.$router.replace("/login");
+    }
   }
 };
 </script>
@@ -91,5 +117,16 @@ export default {
   color: #333;
   text-align: center;
   line-height: 60px;
+}
+.head {
+  overflow: hidden;
+}
+.right {
+  float: right;
+  margin-right: 10px;
+  font-size: 20px;
+}
+.pright {
+  float: right;
 }
 </style>

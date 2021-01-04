@@ -6,17 +6,18 @@
           <el-input v-model="user.title" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item label="活动期限" label-width="100px">
-          <el-time-picker
-            is-range
-            arrow-control
-            v-model="time"
-            range-separator="至"
-            start-placeholder="开始时间"
-            end-placeholder="结束时间"
-            placeholder="time"
-          ></el-time-picker>
+          <div class="block">
+            <el-date-picker
+              v-model="value"
+              type="datetimerange"
+              @change="changeTime"
+              value-format="timestamp"
+              range-separator="至"
+              start-placeholder="开始日期"
+              end-placeholder="结束日期"
+            ></el-date-picker>
+          </div>
         </el-form-item>
-        {{user}}
         <el-form-item label="一级分类" label-width="100px">
           <el-select v-model="user.first_cateid" @change="secondlist">
             <el-option label="请选择" value disabled></el-option>
@@ -56,8 +57,8 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="cancel">取 消</el-button>
-        <el-button type="primary" @click="seckilladd">确 定</el-button>
-        <el-button type="primary">修 改</el-button>
+        <el-button type="primary" v-if="popup.isadd" @click="seckilladd">确 定</el-button>
+        <el-button type="primary" v-else @click="edit">修 改</el-button>
       </div>
     </el-dialog>
   </div>
@@ -65,8 +66,15 @@
 
 <script>
 import { mapActions, mapGetters } from "vuex";
-import { cateListUrl, goodsListUrl, seckillAddUrl } from "../../../utils/http";
-import { successalter } from "../../../utils/alter";
+import {
+  cateListUrl,
+  goodsListUrl,
+  seckillAddUrl,
+  seckillDetailUrl,
+  seckillEdit,
+  seckillEditUrl
+} from "../../../utils/http";
+import { successalter,erroralter } from "../../../utils/alter";
 export default {
   data() {
     return {
@@ -79,28 +87,33 @@ export default {
         goodsid: "",
         status: 1
       },
-      secondCateList: [],
-      goodslistname: [],
-      time: [new Date(2020, 12, 30, 16, 20), new Date(2020, 12, 30, 17, 20)]
+      secondCateList: "",
+      goodslistname: "",
+      value: []
     };
   },
   props: ["popup"],
   computed: {
     ...mapGetters({
-      catelist: "cate/list"
-      //   goodslist:"goods/list"
+      catelist: "cate/list",
+      seckilllist: "seckill/list"
     })
   },
   methods: {
     ...mapActions({
-      cateobtainList: "cate/obtainList"
-      //   goodsobtainList:"goods/obtainList"
+      cateobtainList: "cate/obtainList",
+      seckillobtainList: "seckill/obtainList"
     }),
     cancel() {
       if (!this.popup.isadd) {
-        this.usernull;
+        this.usernull();
       }
       this.popup.isshow = false;
+    },
+    // 时间戳
+    changeTime() {
+      this.user.begintime = this.value[0];
+      this.user.endtime = this.value[1];
     },
     // 二级
     secondlist() {
@@ -120,7 +133,10 @@ export default {
       this.getsecondgooodslist();
     },
     getsecondgooodslist() {
-      goodsListUrl({ fid: this.user.first_cateid, sid: this.user.second_cateid}).then(res => {
+      goodsListUrl({
+        fid: this.user.first_cateid,
+        sid: this.user.second_cateid
+      }).then(res => {
         if (res.data.code === 200) {
           this.goodslistname = res.data.list;
         }
@@ -137,8 +153,7 @@ export default {
         goodsid: "",
         status: 1
       };
-      this.secondCateList = [];
-      this.goodslistname = [];
+      this.value = [];
     },
     // 验证
     checkProps() {
@@ -174,6 +189,32 @@ export default {
             successalter(res.data.msg);
             this.usernull();
             this.cancel();
+            this.seckillobtainList();
+          }
+        });
+      });
+    },
+    // 获取详情
+    getOne(id) {
+      seckillDetailUrl({ id: id }).then(res => {
+        if (res.data.code === 200) {
+          this.user = res.data.list;
+          this.user.id = id;
+          this.value = [this.user.begintime, this.user.endtime];
+        }
+      });
+      
+    },
+    // 编辑
+    edit() {
+      this.checkProps().then(() => {
+        this.changeTime();
+        seckillEditUrl(this.user).then(res => {
+          if (res.data.code === 200) {
+            successalter(res.data.msg);
+            this.cancel();
+            this.seckillobtainList();
+            this.usernull();
           }
         });
       });

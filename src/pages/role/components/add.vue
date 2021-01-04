@@ -36,6 +36,7 @@ import {
   roleEditUrl
 } from "../../../utils/http";
 import { successalter, erroralter } from "../../../utils/alter";
+import { mapActions, mapGetters } from "vuex";
 export default {
   props: ["popup"],
   data() {
@@ -53,10 +54,19 @@ export default {
       // console.log(res);
       if (res.data.code === 200) {
         this.menulist = res.data.list;
+        console.log(this.menulist);
       }
     });
   },
+  computed: {
+    ...mapGetters({
+      userlist: "userlist"
+    })
+  },
   methods: {
+    ...mapActions({
+      obtainuserList: "obtainuserList"
+    }),
     cancel() {
       this.popup.isshow = false;
     },
@@ -66,7 +76,7 @@ export default {
         menus: "",
         status: 1
       };
-        this.$refs.tree.setCheckedKeys([]);
+      this.$refs.tree.setCheckedKeys([]);
     },
     // 验证
     checkProps() {
@@ -75,10 +85,10 @@ export default {
           erroralter("角色名称不能为空");
           return;
         }
-        // if (this.$refs.tree.setCheckedKeys().length=== 0) {
-        //   erroralter("请设置角色权限");
-        //   return;
-        // }
+        if (this.$refs.tree.getCheckedKeys().length == 0) {
+          erroralter("请设置角色权限");
+          return;
+        }
         resolve();
       });
     },
@@ -109,16 +119,25 @@ export default {
         this.$refs.tree.setCheckedKeys(JSON.parse(this.user.menus));
       });
     },
+    // 修改
     roleedit() {
-      //先取出树形控件的数据给menus，再发请求
-      this.user.menus = JSON.stringify(this.$refs.tree.getCheckedKeys());
-      roleEditUrl(this.user).then(res => {
-        if (res.data.code === 200) {
-          successalter(res.data.msg);
-          this.cancel();
-          this.$emit("init");
-          this.usernull();
-        }
+      this.checkProps().then(() => {
+        //先取出树形控件的数据给menus，再发请求
+        this.user.menus = JSON.stringify(this.$refs.tree.getCheckedKeys());
+        // console.log(this.user.menus);
+        roleEditUrl(this.user).then(res => {
+          if (res.data.code === 200) {
+            successalter(res.data.msg);
+            if (this.user.id == this.userlist.roleid) {
+              this.obtainuserList({});
+              this.$router.push("/login");
+              return;
+            }
+            this.cancel();
+            this.$emit("init");
+            this.usernull();
+          }
+        });
       });
     }
   }
